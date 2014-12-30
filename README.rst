@@ -29,7 +29,7 @@ compatible shell):
 
     $ diff-annotate <(diff -u filea fileb) review.html
 
-A wild editor appears! Add something like :code:`> Oh noes, you **should not**
+A wild editor_ appears! Add something like :code:`> Oh noes, you **should not**
 remove this line` below the line :code:`-some line to remove`.
 
 Once saved, you can then see the result in your favorite browser:
@@ -100,3 +100,12 @@ With pip and python 3::
     $ pip install https://github.com/BenoitZugmeyer/diff-annotate/archive/master.zip
 
 .. _reStructuredText: http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html
+
+Editor
+======
+
+The editor spawned is your default editor. You can change it to anything you
+like by setting the :code:`EDITOR` environment variable in your :code:`.bashrc`
+(or whatever works for you). For example, to use sublime text::
+
+    $ echo 'export EDITOR="subl -w"' >> ~/.bashrc
