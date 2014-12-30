@@ -137,11 +137,11 @@ def iter_diff(diff):
             yield ('chunk', line, (chunk,))
             index = 0
 
-        elif chunk and (line.startswith(' ') or line.startswith('+')):
+        elif chunk and line.startswith('+'):
             yield ('diffline', line, (add_file, True, chunk[1] + index))
             index += 1
 
-        elif chunk and line.startswith('-'):
+        elif chunk and (line.startswith(' ') or line.startswith('-')):
             yield ('diffline', line, (del_file, False, chunk[0] + index))
             index += 1
 
