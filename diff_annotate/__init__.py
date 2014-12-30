@@ -1,6 +1,4 @@
 import sys
-import subprocess
-import shlex
 import os.path
 import re
 import json
@@ -36,20 +34,6 @@ class Formatter(HtmlFormatter):
                     '</div>'
             else:
                 yield from super()._format_lines(((ttype, value),))
-
-
-def git(*args):
-    args = ('git',) + args
-    tsk = subprocess.Popen(args,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT)
-    output = tsk.stdout.read()
-    if tsk.wait() != 0:
-        raise Exception('Command {} failed: {}'.format(
-            ' '.join(shlex.quote(a) for a in args),
-            output.decode(),
-        ))
-    return output
 
 
 def formatHTML(diff, annotations):
