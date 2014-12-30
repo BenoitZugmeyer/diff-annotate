@@ -61,6 +61,12 @@ Or a :code:`git diff` command:
 
     $ diff-annotate <(git diff -w HEAD^) review.html
 
+Or even a git commit with a message:
+
+.. code:: bash
+
+    $ diff-annotate <(git show HEAD) review.html
+
 Annotations syntax
 ==================
 
