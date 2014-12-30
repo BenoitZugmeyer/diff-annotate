@@ -7,7 +7,7 @@ Generates a HTML file from a diff file and some annotations.
 Example
 =======
 
-We'll take too files as an example: `filea` and `fileb`.
+We'll take two files as an example: :code:`filea` and :code:`fileb`.
 
 .. code:: bash
 
