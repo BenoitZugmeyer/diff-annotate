@@ -7,7 +7,7 @@ def readme():
         return f.read()
 
 setup(name='diff-annotate',
-      version='0.0.1',
+      version='0.0.2',
       description='Format a diff by adding annotations',
       long_description=readme(),
       url='https://github.com/BenoitZugmeyer/diff-annotate/',
