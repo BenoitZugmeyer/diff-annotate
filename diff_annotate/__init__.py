@@ -123,7 +123,7 @@ def iter_diff(diff):
     add_file = None
     del_file = None
     chunk = None
-    del_index = add_index = 0
+    extra_index = del_index = add_index = 0
 
     for line in diff.split('\n'):
 
@@ -157,18 +157,22 @@ def iter_diff(diff):
             yield ('comment', line, (line[1:].strip(),))
 
         else:
-            yield ('extra', line, tuple())
+            yield ('extra', line, (extra_index,))
+            extra_index += 1
 
 
 def parse_annotations_in_diff(diff):
     result = []
 
-    diffline = (None, False, 0)
+    diffline = (None, False, -1)
 
     for type, line, infos in iter_diff(diff):
 
         if type == 'diffline':
             diffline = infos
+
+        elif type == 'extra':
+            diffline = (None, False, infos[0])
 
         elif type == 'comment':
             result.append(Annotation(
@@ -211,18 +215,21 @@ def insert_annotations(diff, annotations):
     annotations = sort_annotations(annotations)
     lines = []
 
-    pre_key = (None, False, 0)
-    if pre_key in annotations:
-        for comment in annotations[pre_key]:
-            lines.append('> ' + comment)
+    def add_annotations(key):
+        if key in annotations:
+            for comment in annotations[key]:
+                lines.append('> ' + comment)
+
+    add_annotations((None, False, -1))
 
     for type, line, infos in iter_diff(diff):
         lines.append(line)
 
         if type == 'diffline':
-            if infos in annotations:
-                for comment in annotations[infos]:
-                    lines.append('> ' + comment)
+            add_annotations(infos)
+
+        elif type == 'extra':
+            add_annotations((None, False, infos[0]))
 
     return '\n'.join(lines)
 

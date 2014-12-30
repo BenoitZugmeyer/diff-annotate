@@ -8,6 +8,7 @@ class TestDiffAnotate(TestCase):
     def test_iter_diff_simple(self):
 
         result = list(diff_annotate.iter_diff(r'''
+some text
 --- "file a"       2014-12-30 18:39:18.682725526 +0100
 +++ "file \" b"       2014-12-30 18:39:30.212509006 +0100
 @@ -1,5 +1,4 @@
@@ -22,7 +23,8 @@ class TestDiffAnotate(TestCase):
         ))
 
         self.assertEqual(result, [
-            ('extra', '', tuple()),
+            ('extra', '', (0,)),
+            ('extra', 'some text', (1,)),
             ('filename', '--- "file a"       2014-12-30 18:39:18.682725526 +0100', (False, 'file a')),
             ('filename', '+++ "file \\" b"       2014-12-30 18:39:30.212509006 +0100', (True, 'file " b')),
             ('chunk', '@@ -1,5 +1,4 @@', ((1, 1),)),
@@ -33,7 +35,7 @@ class TestDiffAnotate(TestCase):
             ('comment', '> this is a comment', ('this is a comment',)),
             ('diffline', '+this is a new line', ('file " b', True, 3)),
             ('diffline', ' baz', ('file a', False, 5)),
-            ('extra', '', tuple()),
+            ('extra', '', (2,)),
         ])
 
     def test_parse_file_name(self):
@@ -54,8 +56,8 @@ class TestDiffAnotate(TestCase):
 
 
     def test_parse_annotations_in_diff(self):
-        annotations = diff_annotate.parse_annotations_in_diff(r'''
-> header comment
+        annotations = diff_annotate.parse_annotations_in_diff(r'''> header comment
+some text
 > this is another one
 --- filea       2014-12-30 18:39:18.682725526 +0100
 +++ fileb       2014-12-30 18:39:30.212509006 +0100
@@ -71,7 +73,7 @@ baz
 ''')
 
         self.assertEqual(annotations, [
-            diff_annotate.Annotation(None, False, 0, 'header comment'),
+            diff_annotate.Annotation(None, False, -1, 'header comment'),
             diff_annotate.Annotation(None, False, 0, 'this is another one'),
             diff_annotate.Annotation('filea', False, 4, 'this is a comment'),
             diff_annotate.Annotation('fileb', True, 3, 'this is a comment 2'),
@@ -109,13 +111,13 @@ oeu
 
     def test_insert_annotations(self):
         annotations = [
-            diff_annotate.Annotation(None, False, 0, 'header comment'),
+            diff_annotate.Annotation(None, False, -1, 'header comment'),
             diff_annotate.Annotation(None, False, 0, 'this is another one'),
             diff_annotate.Annotation('filea', False, 4, 'this is a comment'),
             diff_annotate.Annotation('fileb', True, 3, 'this is a comment 2'),
         ]
 
-        output = diff_annotate.insert_annotations(r'''
+        output = diff_annotate.insert_annotations(r'''some text
 --- filea       2014-12-30 18:39:18.682725526 +0100
 +++ fileb       2014-12-30 18:39:30.212509006 +0100
 @@ -1,5 +1,4 @@
@@ -124,12 +126,12 @@ oeu
 -some line to remove
 -this one too
 +this is a new line
-baz
+ baz
 ''', annotations)
 
         self.assertEqual(output, r'''> header comment
+some text
 > this is another one
-
 --- filea       2014-12-30 18:39:18.682725526 +0100
 +++ fileb       2014-12-30 18:39:30.212509006 +0100
 @@ -1,5 +1,4 @@
@@ -140,5 +142,5 @@ baz
 > this is a comment
 +this is a new line
 > this is a comment 2
-baz
+ baz
 ''')
