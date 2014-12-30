@@ -23,4 +23,6 @@ setup(name='diff-annotate',
       entry_points={
           'console_scripts': ['diff-annotate=diff_annotate:main'],
       },
+      test_suite='nose.collector',
+      tests_require=['nose'],
       zip_safe=True)

@@ -2,6 +2,7 @@ import sys
 import os.path
 import re
 import json
+import shlex
 from collections import namedtuple, defaultdict
 
 import docutils.core
@@ -110,24 +111,29 @@ def formatHTML(diff, annotations):
 chunk_re = re.compile(r'@@\s*-(\d+),\d+\s+\+(?:(\d+),)?\d+\s*@@')
 
 
-Annotation = namedtuple('Annotation', ['file', 'line', 'add', 'comment'])
+Annotation = namedtuple('Annotation', ['file', 'add', 'line', 'comment'])
+
+
+def parse_file_name(line):
+    lex = shlex.shlex(line, posix=True)
+    return next(lex)
 
 
 def iter_diff(diff):
     add_file = None
     del_file = None
     chunk = None
-    index = 0
+    del_index = add_index = 0
 
     for line in diff.split('\n'):
 
         if line.startswith('--- '):
-            del_file = line[4:]
+            del_file = parse_file_name(line[4:])
             yield ('filename', line, (False, del_file))
             chunk = None
 
         elif line.startswith('+++ '):
-            add_file = line[4:]
+            add_file = parse_file_name(line[4:])
             yield ('filename', line, (True, add_file))
             chunk = None
 
@@ -135,15 +141,17 @@ def iter_diff(diff):
             chunk = tuple(int(l) if l else 0
                           for l in chunk_re.match(line).groups())
             yield ('chunk', line, (chunk,))
-            index = 0
+            add_index = del_index = 0
 
         elif chunk and line.startswith('+'):
-            yield ('diffline', line, (add_file, True, chunk[1] + index))
-            index += 1
+            yield ('diffline', line, (add_file, True, chunk[1] + add_index))
+            add_index += 1
 
         elif chunk and (line.startswith(' ') or line.startswith('-')):
-            yield ('diffline', line, (del_file, False, chunk[0] + index))
-            index += 1
+            yield ('diffline', line, (del_file, False, chunk[0] + del_index))
+            del_index += 1
+            if line.startswith(' '):
+                add_index += 1
 
         elif line.startswith('>'):
             yield ('comment', line, (line[1:].strip(),))
