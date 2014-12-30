@@ -247,6 +247,8 @@ def insert_annotations(diff, annotations):
                ($EDITOR), letting the user to annotate it by inserting lines
                starting with "greater than" character (>).
 
+               Annotations are formatted with reStructuredText.
+
                The output file will then be written by formatting the diff code
                and inserting the annotations.
 

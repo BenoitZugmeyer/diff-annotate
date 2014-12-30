@@ -22,7 +22,7 @@ Example
 
     $ diff-annotate <(diff -u filea fileb) review.html
     # A wild editor appears!
-    # Add something like "> Oh noes, you should not remove this line" 
+    # Add something like "> Oh noes, you **should not** remove this line" 
     # below the line "-some line to remove".
 
     # You can then see the result in your favorite browser:
