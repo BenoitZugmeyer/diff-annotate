@@ -279,14 +279,16 @@ def main(input, output):
 
         diff = insert_annotations(diff, annotations)
 
-    diff = click.edit(diff, extension='.diff')
+    mod_diff = click.edit(diff, extension='.diff')
 
-    if not diff and exists:
-        click.echo('No change, aborting')
-        sys.exit(0)
+    if not mod_diff:
+        if exists:
+            click.echo('No change, aborting')
+            sys.exit(0)
+        mod_diff = diff;
 
-    annotations = parse_annotations_in_diff(diff)
-    html = formatHTML(diff, annotations)
+    annotations = parse_annotations_in_diff(mod_diff)
+    html = formatHTML(mod_diff, annotations)
 
     with open(output, 'w') as fp:
         fp.write(html)
